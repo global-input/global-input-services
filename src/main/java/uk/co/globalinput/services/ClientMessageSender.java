@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +15,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 
 import io.socket.client.IO;
+import io.socket.client.IO.Options;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
@@ -130,11 +133,28 @@ public class ClientMessageSender {
 		
     	if(socket==null){
     		try{
-    			Socket tsocket=IO.socket(this.websocketURL);    		
-    			tsocket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
+    			logger.info("----connecting to:"+this.websocketURL);
+    			String websocketURL=this.websocketURL;
+    			// default settings for all sockets
+    			//SSLContext mySSLContext=MYSSLContext.getSSLContext();
+    			//IO.setDefaultSSLContext(mySSLContext);
+    			//HostnameVerifier myHostnameVerifier=MYSSLContext.createHostnameVerifier();
+    			
+    			//IO.setDefaultHostnameVerifier(myHostnameVerifier);
+
+    			// set as an option
+    			//Options opts = new IO.Options();
+    			//opts.sslContext = mySSLContext;
+    			//opts.hostnameVerifier = myHostnameVerifier;
+    			//Socket tsocket = IO.socket(websocketURL, opts);
+    			
+    			Socket tsocket=IO.socket(websocketURL);    
+    			
+    			tsocket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {    				
     					@Override
     					public void call(Object... args) {    		    
-    						logger.info("websocket is connected");
+    						
+    						logger.info("websocket is connected:"+websocketURL);
     						socket=tsocket;
     						sendMessageInQueue();      						
     					}
