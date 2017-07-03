@@ -1,0 +1,5 @@
+source deploy/util.sh
+getProjectVersionFromPom
+setPackageVersion
+package
+deploy/create_deploy_scripts.sh

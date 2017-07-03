@@ -1,0 +1,58 @@
+buildscript {
+	ext {
+		springBootVersion = '1.5.4.RELEASE'
+	}
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+		classpath('se.transmode.gradle:gradle-docker:1.2')
+	}
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = 1.8
+
+group = 'dilshat'
+
+apply plugin: 'docker'
+
+task buildDocker(type: Docker, dependsOn: build) {
+  push = true
+  applicationName = jar.baseName
+  dockerfile = file('src/main/docker/Dockerfile')
+  doFirst {
+    copy {
+      from jar
+      into stageDir
+    }
+  }
+}
+
+repositories {
+	mavenCentral()
+}
+
+
+dependencies {
+	compile('org.springframework.boot:spring-boot-starter-data-rest')
+	compile('org.springframework.boot:spring-boot-starter-websocket')
+	compile("org.webjars:webjars-locator")
+	compile("org.webjars:sockjs-client:1.0.2")
+    compile("org.webjars:stomp-websocket:2.3.3")
+    compile("org.webjars:bootstrap:3.3.7")
+    compile("org.webjars:jquery:3.1.0")
+	compile('com.google.zxing:core:3.3.0')		
+	compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.8.2'
+	compile ('io.socket:socket.io-client:0.8.3') {
+		  // excluding org.json which is provided by Android
+		  exclude group: 'org.json', module: 'json'
+	}
+	compile group: 'org.codehaus.jackson', name: 'jackson-mapper-asl', version: '1.8.9'
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+}

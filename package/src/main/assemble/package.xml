@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<assembly>
+	<id>distribution</id>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <baseDirectory>maven</baseDirectory>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <fileSets>
+
+           <fileSet>
+                   <directory>../src/main/docker</directory>
+                   <includes>
+                       <include>**/*</include>
+                   </includes>
+                   <outputDirectory>/</outputDirectory>
+           </fileSet>
+
+           <fileSet>
+                   <directory>../</directory>
+                   <includes>
+                       <include>*.sh</include>
+                       <include>*.yml</include>
+                   </includes>
+                   <outputDirectory>/</outputDirectory>
+           </fileSet>
+
+    </fileSets>
+</assembly>

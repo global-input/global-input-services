@@ -1,0 +1,14 @@
+version: '2'
+services:
+
+  global_input_services:
+    build: .
+    image: dilshat/global_input_services
+    container_name: global_input_services
+    ports:
+      - "8080:8080"
+          
+networks:
+  default:
+     external:
+       name: iterativesolution_default
