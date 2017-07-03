@@ -1,6 +1,7 @@
 version: '2'
 services:
 
+  
   global_input_services:
     build: .
     image: dilshat/global_input_services
