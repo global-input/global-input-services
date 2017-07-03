@@ -4,7 +4,7 @@
 
 	<groupId>uk.co.globalinput</groupId>
 	<artifactId>global-input-services</artifactId>
-	<version>0.0.3-SNAPSHOT</version>
+	<version>0.0.2</version>
 	<packaging>jar</packaging>
 
 	<name>global-input-services</name>
