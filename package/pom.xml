@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>global-input-services</artifactId>
     <groupId>uk.co.globalinput</groupId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.3-SNAPSHOT</version>
     <packaging>pom</packaging>
     <properties>
             <maven.assembly.plugin.version>2.2</maven.assembly.plugin.version>

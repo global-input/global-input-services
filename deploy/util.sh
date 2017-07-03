@@ -19,6 +19,12 @@ executeScript(){
    ssh $deploy_to_username@$deploy_to_hostname 'bash -s' < $1      
    echo "remote execution completed"   
 }
+
+executeDeployedScriptOnServer(){
+   echo "executing the deployed script $1 remotely  on  $deploy_to_username@$deploy_to_hostname "
+   ssh $deploy_to_username@$deploy_to_hostname "cd $destzipfolder && ./$1"      
+   echo "remote execution completed"   
+}
   
 createFolders(){
     createUniqueidforfilename
@@ -108,4 +114,7 @@ package(){
 	cd package
 	mvn package
 	cd ..		
+}
+buildAndStartDocker(){	
+	executeDeployedScriptOnServer start.sh
 }

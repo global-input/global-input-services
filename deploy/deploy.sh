@@ -9,4 +9,5 @@ uploadZipFile
 uploadJarFile
 unzipZipFile
 makeSchellScriptExecutable
+buildAndStartDocker
 
