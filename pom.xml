@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>uk.co.globalinput</groupId>
 	<artifactId>global-input-services</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<packaging>jar</packaging>
 
 	<name>global-input-services</name>
@@ -15,7 +14,7 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>1.5.4.RELEASE</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 
 	<properties>
@@ -23,8 +22,28 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
 		<docker.image.prefix>dilshat</docker.image.prefix>
+		 <maven.assembly.plugin.version>2.2</maven.assembly.plugin.version>
 	</properties>
-
+ <distributionManagement>
+        <snapshotRepository>
+            <uniqueVersion>false</uniqueVersion>
+            <id>snapshot-internal-repository</id>
+            <url>http://repo.iterativesolution.co.uk/nexus/content/repositories/snapshots-local</url>
+        </snapshotRepository>
+        <repository>
+            <uniqueVersion>false</uniqueVersion>
+            <id>internal-repository</id>
+            <url>http://repo.iterativesolution.co.uk/nexus/content/repositories/releases-local</url>
+        </repository>
+        <site>
+            <id>site-location</id>
+            <url>${site.location}</url>
+        </site>
+    </distributionManagement>
+      <scm>
+        <connection>scm:ssh://git@github.com:global-input/global-input-services.git</connection>
+    </scm>
+    
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -110,6 +129,32 @@
                 </resources>
             </configuration>
         </plugin>
+        
+        
+         <plugin>
+            <groupId>external.atlassian.jgitflow</groupId>
+            <artifactId>jgitflow-maven-plugin</artifactId>
+            <version>1.0-m4.3</version>
+              <configuration>
+                 <!--     
+                    <enableSshAgent>true</enableSshAgent>
+                     -->
+                    <autoVersionSubmodules>true</autoVersionSubmodules> 
+                    <pushFeatures>true</pushFeatures>    
+                    <pushReleases>true</pushReleases>    
+                    <pushHotfixes>true</pushHotfixes>
+                                     
+                     
+                    <noDeploy>true</noDeploy>
+                                
+                    <flowInitContext>      
+                       <developBranchName>develop</developBranchName>
+                       <versionTagPrefix>release-</versionTagPrefix>
+                       <masterBranchName>master</masterBranchName>
+                    </flowInitContext>
+             </configuration>
+        </plugin>
+        
 		</plugins>
 	</build>
 

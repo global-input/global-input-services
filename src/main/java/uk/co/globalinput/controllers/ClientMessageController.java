@@ -75,7 +75,7 @@ public class ClientMessageController {
     
   /**
    * 
-   * @param dataId
+   * @param clientId
    * @param request
    * @return
    * @throws IOException
