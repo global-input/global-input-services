@@ -1,5 +1,6 @@
 package uk.co.globalinput.services;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import io.socket.client.IO;
 import io.socket.client.IO.Options;
+import io.socket.client.Manager;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
@@ -56,6 +58,10 @@ public class ClientMessageSender {
 	
 	@Value("${websocket.url}")
 	private String websocketURL;
+	
+	@Value("${websocket.namespace}")
+	private String websocketNamewspace;
+	
 	
 	
 	private Socket socket=null;
@@ -127,6 +133,7 @@ public class ClientMessageSender {
 				
 	}
 	
+	private Socket tsocket=null;
 	public void sendMessage(final String clientId, final Map<String, Object> messageObject){	
 		
 		addMessageToQueue(clientId, messageObject);
@@ -148,7 +155,14 @@ public class ClientMessageSender {
     			//opts.hostnameVerifier = myHostnameVerifier;
     			//Socket tsocket = IO.socket(websocketURL, opts);
     			
-    			Socket tsocket=IO.socket(websocketURL);    
+    			if(websocketNamewspace!=null && websocketNamewspace.trim().length()>0){
+    				Manager manager = new Manager(new URI(websocketURL));
+    				tsocket = manager.socket(websocketNamewspace);    				
+    			}
+    			else{
+    				tsocket=IO.socket(websocketURL);
+    			}
+    			
     			
     			tsocket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {    				
     					@Override

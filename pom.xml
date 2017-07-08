@@ -4,7 +4,7 @@
 
 	<groupId>uk.co.globalinput</groupId>
 	<artifactId>global-input-services</artifactId>
-	<version>0.0.4</version>
+	<version>0.0.5</version>
 	<packaging>jar</packaging>
 
 	<name>global-input-services</name>
@@ -108,12 +108,25 @@
 	</dependencies>
 
 	<build>
+	<!-- 
+	    <resources>
+            <resource>
+                <directory>resources</directory>
+                <targetPath>${project.build.outputDirectory}</targetPath>
+                <includes>
+                    <include>application.properties</include>
+                </includes>
+            </resource>
+        </resources>
+         -->
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<!-- 
 			<plugin>
+			
             <groupId>com.spotify</groupId>
             <artifactId>docker-maven-plugin</artifactId>
             <version>0.4.11</version>
@@ -129,6 +142,7 @@
                 </resources>
             </configuration>
         </plugin>
+         -->
         
         
          <plugin>
