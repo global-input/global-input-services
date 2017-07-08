@@ -5,56 +5,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLContext;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-
 
 import io.socket.client.IO;
-import io.socket.client.IO.Options;
 import io.socket.client.Manager;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
-class ClientMessage{
-	String clientId;
-	Map<String, Object> message;
-	
-	
-	public ClientMessage(String queueId, final Map<String, Object> message){
-		this.clientId=queueId;
-		this.message=message;
-	}
+import uk.co.globalinput.data.GlobalInputMessage;
 
-	public String getClientId() {
-		return clientId;
-	}
-
-	public void setClientId(String clientId) {
-		this.clientId = clientId;
-	}
-
-	public Map<String, Object> getMessage() {
-		return message;
-	}
-
-	public void setMessage(Map<String, Object> message) {
-		this.message = message;
-	}
-	
-	
-}
 
 
 
 @Component
-public class ClientMessageSender {
-	private static Logger logger=Logger.getLogger(ClientMessageSender.class);
+public class GlobalInputMessageService {
+	private static Logger logger=Logger.getLogger(GlobalInputMessageService.class);
 	
 	@Value("${websocket.url}")
 	private String websocketURL;
@@ -66,44 +34,34 @@ public class ClientMessageSender {
 	
 	private Socket socket=null;
 	
-	List<ClientMessage> messagesToSend = new ArrayList<ClientMessage>();
+	List<GlobalInputMessage> messagesToSend = new ArrayList<GlobalInputMessage>();
 	
-	private  static com.fasterxml.jackson.databind.ObjectMapper createObjectMapper(){
-        com.fasterxml.jackson.databind.ObjectMapper objectMapper=new com.fasterxml.jackson.databind.ObjectMapper();
-        objectMapper.setSerializationInclusion(Include.NON_NULL);       
-        objectMapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
-        objectMapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_INVALID_SUBTYPE, false);
-        objectMapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false);
-        objectMapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_NUMBERS_FOR_ENUMS, false);
-        objectMapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        return objectMapper;
-	}
-	private void addMessageToQueue( String clientId, final Map<String, Object> messageObject){
-		if(clientId==null){
-			return;
-		}
-		clientId=clientId.trim();
-		if(clientId.length()==0){
-			return;
-		}
-		if(messageObject==null|| messageObject.size()==0){
-			return;
-		}
+	private void addMessageToQueue(GlobalInputMessage message){
 		synchronized (messagesToSend) {
-				messagesToSend.add(new ClientMessage(clientId,messageObject));				
-		}
-				
+			messagesToSend.add(message);				
+	    }
 	}
 	
-	private void sendMessageToClient(ClientMessage wrappedMessage){
-		logger.info("Sending the message:"+wrappedMessage.message+" to :"+wrappedMessage.clientId);
-		com.fasterxml.jackson.databind.ObjectMapper objectMapper=createObjectMapper();
+	private void addMessageToQueue(String session, String client, Map<String, Object> messageObject){
+		if(session==null| client==null || messageObject==null){
+			return;
+		}
+		session=session.trim();
+		client=client.trim();		
+		if(session.length()==0 || client.length()==0|| messageObject.size()==0){
+			return;
+		}		
+		addMessageToQueue(new GlobalInputMessage(session,client,messageObject));				
+	}
+	
+	private void sendMessage(GlobalInputMessage message){
+		logger.info("Sending the message to: client "+message.getClient()+" message: "+message.getClient());		
 		String content=null;
 		try{
-			content=objectMapper.writeValueAsString(wrappedMessage);
+			content=message.toJsonString();
 		}
 		catch(Exception e){
-			logger.error(e+" while converting the message to json:"+wrappedMessage);
+			logger.error(e+" while converting the message to json:"+message);
 			return;
 		}
 		socket.emit("sendToClient", content);
@@ -114,8 +72,8 @@ public class ClientMessageSender {
 						if(messagesToSend.size()==0){
 							return;
 						}
-						for(ClientMessage message:messagesToSend){	
-							sendMessageToClient(message);
+						for(GlobalInputMessage message:messagesToSend){	
+							sendMessage(message);
 						}	
 						messagesToSend.clear();
 					}
@@ -134,9 +92,9 @@ public class ClientMessageSender {
 	}
 	
 	private Socket tsocket=null;
-	public void sendMessage(final String clientId, final Map<String, Object> messageObject){	
+	public void sendMessage(final String session, String client,final Map<String, Object> messageObject){	
 		
-		addMessageToQueue(clientId, messageObject);
+		addMessageToQueue(session,client, messageObject);
 		
     	if(socket==null){
     		try{

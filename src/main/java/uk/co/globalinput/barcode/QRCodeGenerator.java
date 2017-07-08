@@ -10,15 +10,26 @@ import java.util.Hashtable;
 
 import javax.imageio.ImageIO;
 
+import org.springframework.stereotype.Component;
+
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+
+import uk.co.globalinput.data.QRMessage;
+
+
+@Component
 public class QRCodeGenerator {
 		
-	public static void createQRImage(OutputStream out, String qrCodeText, int size,
+	public  void createQRImage(OutputStream out, QRMessage qrMessage, int size, String fileType) throws WriterException, IOException{		
+		String content=qrMessage.toJsonString();
+		createQRImage(out,content,size,fileType);			
+	}
+	public void createQRImage(OutputStream out, String qrCodeText, int size,
 			String fileType) throws WriterException, IOException {
 		// Create the ByteMatrix for the QR-Code that encodes the given String
 		Hashtable hintMap = new Hashtable();
@@ -48,7 +59,7 @@ public class QRCodeGenerator {
 		ImageIO.write(image, fileType, out);
 	}
 
-	private static void createQRImage(File qrFile, String qrCodeText, int size,
+	private  void createQRImage(File qrFile, String qrCodeText, int size,
 			String fileType) throws WriterException, IOException {
 		OutputStream out=new FileOutputStream(qrFile);
 		createQRImage(out,qrCodeText,size,fileType);

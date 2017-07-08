@@ -14,10 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.zxing.WriterException;
 
 
-
-
 import uk.co.globalinput.barcode.QRCodeGenerator;
-import uk.co.globalinput.services.ClientMessageSender;
+import uk.co.globalinput.data.GlobaInputResponseMessage;
+import uk.co.globalinput.data.QRMessage;
+
+import uk.co.globalinput.services.GlobalInputMessageService;
 
 
 import java.io.ByteArrayOutputStream;
@@ -25,9 +26,9 @@ import java.io.IOException;
 
 import java.net.URISyntaxException;
 
-import java.util.HashMap;
+
 import java.util.Map;
-import java.util.UUID;
+
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -39,51 +40,22 @@ import javax.servlet.http.HttpServletRequest;
  *
  */
 
-class ResponseMessage{
-	private String clientId;
-	private String status;	
-	public String getClientId() {
-		return clientId;
-	}
-	public void setClientId(String clientId) {
-		this.clientId = clientId;
-	}
-	public String getStatus() {
-		return status;
-	}
-	public void setStatus(String status) {
-		this.status = status;
-	}
-	public ResponseMessage(String clientId, String status) {
-		super();
-		this.clientId = clientId;
-		this.status = status;
-	}
-	
-}
+
 @RestController
 public class ClientMessageController {
     private static Logger logger=Logger.getLogger(ClientMessageController.class);
     
     @Autowired
-    private ClientMessageSender clientMessageSender; 
+    private GlobalInputMessageService clientMessageSender; 
     
-    private String createNewClient(){
-    	UUID id=UUID.randomUUID();    	
-    	return id.toString();
-    }
+    @Autowired
+    QRCodeGenerator qrCodeGenerator;
     
-  /**
-   * 
-   * @param clientId
-   * @param request
-   * @return
-   * @throws IOException
-   * @throws WriterException
-   */
+    
+    
     @CrossOrigin(origins="*")
-	@RequestMapping(value="/global-input/clients/{clientId}/qr-code", method = RequestMethod.GET, produces = "image/png")
-	public byte[] showBarCode(@PathVariable String clientId, HttpServletRequest request) throws IOException, WriterException{
+	@RequestMapping(value="/global-input/qr-code/{session}/{client}/{data}", method = RequestMethod.GET, produces = "image/png")
+	public byte[] showBarCode(@PathVariable String session,@PathVariable String client, @PathVariable String data, HttpServletRequest request) throws IOException, WriterException{
 		int size=125; 
 		String sizeValue = request.getParameter("size");
 		if(sizeValue!=null){
@@ -101,29 +73,32 @@ public class ClientMessageController {
 			}			
 		}
 		
+		String imageType = request.getParameter("imageType");
+		if(imageType!=null){
+			imageType=imageType.trim().toLowerCase();						
+		}
+		if(imageType==null || imageType.length()==0){
+			imageType="png";
+		}
+		
+		QRMessage  qrMessage=new QRMessage();
+		qrMessage.setCl(client);
+		qrMessage.setSe(session);	
+		qrMessage.setDt(data);
 		ByteArrayOutputStream out=new ByteArrayOutputStream();
-		QRCodeGenerator.createQRImage(out, clientId, size, "png");
+		qrCodeGenerator.createQRImage(out, qrMessage, size, imageType);		
 		return out.toByteArray();
 	}
     
      
     
     @CrossOrigin(origins="*")
-	@RequestMapping(value="/global-input/clients/{clientId}/messages", method = RequestMethod.POST, produces = "application/json")
+	@RequestMapping(value="/global-input/messages/{session}/{client}", method = RequestMethod.POST, produces = "application/json")
     
-    public ResponseMessage sendMessage(@PathVariable String clientId,@RequestBody Map<String, Object> messageObject,  HttpServletRequest request) throws IOException, URISyntaxException{
-    	logger.info("Received the posted content:"+messageObject);
-    	clientMessageSender.sendMessage(clientId,messageObject);
-    	return new ResponseMessage(clientId, "success");    	
+    public GlobaInputResponseMessage sendMessage(@PathVariable String session, @PathVariable String client,@RequestBody Map<String, Object> messageObject,  HttpServletRequest request) throws IOException, URISyntaxException{
+    	logger.info("Received the posted client:"+client+":"+session);
+    	clientMessageSender.sendMessage(session,client,messageObject);
+    	return new GlobaInputResponseMessage(session,client, "success");    	
     }
-    
-    @CrossOrigin(origins="*")
-	@RequestMapping(value="/global-input/clients", method = RequestMethod.POST, produces = "application/json")
-    public ResponseMessage createClient(@RequestBody Map<String, Object> options){
-    	logger.info("Received the posted create client:"+options);    	
-    	return new ResponseMessage(createNewClient(), "success"); 
-    	
-    }
-    
 	
 }
