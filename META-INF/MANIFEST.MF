@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: global-input-services
+Bundle-SymbolicName: global-input-services
+Bundle-Version: 1.0.0.qualifier
+Export-Package: uk.co.globalinput,
+ uk.co.globalinput.barcode,
+ uk.co.globalinput.controllers,
+ uk.co.globalinput.hello,
+ uk.co.globalinput.services
