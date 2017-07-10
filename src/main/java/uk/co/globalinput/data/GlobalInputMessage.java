@@ -12,13 +12,13 @@ import uk.co.globalinput.util.GlobalInputUtil;
 public class GlobalInputMessage{
 	private String session;
 	private String client;
-	private Map<String, Object> message;
+	private Map<String, Object> data;
 	
-	public GlobalInputMessage(String session, String client, Map<String, Object> message) {
+	public GlobalInputMessage(String session, String client, Map<String, Object> data) {
 		super();
 		this.session = session;
 		this.client = client;
-		this.message = message;
+		this.data = data;
 	}
 	public String getSession() {
 		return session;
@@ -32,11 +32,12 @@ public class GlobalInputMessage{
 	public void setClient(String client) {
 		this.client = client;
 	}
-	public Map<String, Object> getMessage() {
-		return message;
+	
+	public Map<String, Object> getData() {
+		return data;
 	}
-	public void setMessage(Map<String, Object> message) {
-		this.message = message;
+	public void setData(Map<String, Object> data) {
+		this.data = data;
 	}
 	public String toJsonString() throws JsonProcessingException{
 		com.fasterxml.jackson.databind.ObjectMapper objectMapper=GlobalInputUtil.createObjectMapper();				

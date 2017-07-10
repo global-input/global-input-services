@@ -95,9 +95,9 @@ public class ClientMessageController {
     @CrossOrigin(origins="*")
 	@RequestMapping(value="/global-input/messages/{session}/{client}", method = RequestMethod.POST, produces = "application/json")
     
-    public GlobaInputResponseMessage sendMessage(@PathVariable String session, @PathVariable String client,@RequestBody Map<String, Object> messageObject,  HttpServletRequest request) throws IOException, URISyntaxException{
-    	logger.info("Received the posted client:"+client+":"+session);
-    	clientMessageSender.sendMessage(session,client,messageObject);
+    public GlobaInputResponseMessage sendMessage(@PathVariable String session, @PathVariable String client,@RequestBody Map<String, Object> data,  HttpServletRequest request) throws IOException, URISyntaxException{
+    	logger.info("Received the posted client:"+client+":"+session+":"+data);
+    	clientMessageSender.sendMessage(session,client,data);
     	return new GlobaInputResponseMessage(session,client, "success");    	
     }
 	

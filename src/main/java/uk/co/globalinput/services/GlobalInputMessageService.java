@@ -42,29 +42,30 @@ public class GlobalInputMessageService {
 	    }
 	}
 	
-	private void addMessageToQueue(String session, String client, Map<String, Object> messageObject){
-		if(session==null| client==null || messageObject==null){
+	private void addMessageToQueue(String session, String client, Map<String, Object> data){
+		if(session==null| client==null || data==null){
 			return;
 		}
 		session=session.trim();
 		client=client.trim();		
-		if(session.length()==0 || client.length()==0|| messageObject.size()==0){
+		if(session.length()==0 || client.length()==0|| data.size()==0){
 			return;
 		}		
-		addMessageToQueue(new GlobalInputMessage(session,client,messageObject));				
+		addMessageToQueue(new GlobalInputMessage(session,client,data));				
 	}
 	
 	private void sendMessage(GlobalInputMessage message){
-		logger.info("Sending the message to: client "+message.getClient()+" message: "+message.getClient());		
+				
 		String content=null;
 		try{
 			content=message.toJsonString();
 		}
 		catch(Exception e){
-			logger.error(e+" while converting the message to json:"+message);
+			logger.error(e+" while converting the message to json:"+message+":"+content);
 			return;
 		}
-		socket.emit("sendToClient", content);
+		logger.info("Sending the message to: client "+message.getClient()+" message: "+content);
+		socket.emit("sendToSession", content);
 	}
 	private void sendMessageInQueue(){
 			try{	
@@ -92,9 +93,9 @@ public class GlobalInputMessageService {
 	}
 	
 	private Socket tsocket=null;
-	public void sendMessage(final String session, String client,final Map<String, Object> messageObject){	
+	public void sendMessage(final String session, String client,final Map<String, Object> data){	
 		
-		addMessageToQueue(session,client, messageObject);
+		addMessageToQueue(session,client, data);
 		
     	if(socket==null){
     		try{
